@@ -3,7 +3,11 @@ package com.example.todolist.controller;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.example.todolist.entity.Todo;
@@ -34,5 +38,29 @@ public class TodoListController {
 		mv.setViewName("todoForm");
 		mv.addObject("todoData", new TodoData());
 		return mv;
+	}
+	
+	//登録ボタンがクリックされたとき
+	@PostMapping("/todo/create")
+	public ModelAndView createTodo(@ModelAttribute @Validated TodoData todoData, BindingResult result, ModelAndView mv) {
+		//エラーチェック
+		boolean isValid = todoService.isValid(todoData, result);
+		if(!result.hasErrors() && isValid) {
+			//エラーなし
+			Todo todo = todoData.toEntity();
+			todoRepository.saveAndFlush(todo);
+			return showTodoList(mv);
+		} else {
+			//エラーあり
+			mv.setViewName("todoForm");
+			return mv;
+		}
+	}
+	
+	//Todo一覧へ戻る
+	//【処理３】Todo入力画面で「キャンセル登録」ボタンがクリックされたとき
+	@PostMapping("/todo/cancel")
+	public String canccel() {
+		return "redirect:/todo";
 	}
 }
