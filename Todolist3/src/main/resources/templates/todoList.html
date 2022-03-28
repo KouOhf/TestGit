@@ -22,6 +22,7 @@
 			<td><a th:href="@{/todo/__${todo.id}__}" th:text="${todo.title}"></a></td>
 			<td th:text="${todo.importance == 1 ? '★★★':'★'}"></td>
 			<td th:text="${todo.urgency}"></td>
+			<td th:text="${todo.deadline}"></td>
 			<td th:text="${todo.done == 'Y' ? '完了' :''}"></td>
 		</tr>
 	</table>

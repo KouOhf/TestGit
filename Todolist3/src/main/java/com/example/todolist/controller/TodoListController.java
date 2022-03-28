@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -78,5 +79,27 @@ public class TodoListController {
 		return mv;
 	}
 	
+	//「更新」ボタンが押されたときの処理
+	@PostMapping("/todo/update")
+	public String updateTodo(@ModelAttribute @Validated TodoData todoData, BindingResult result, Model model) {
+		//エラーチェック
+		boolean isValid = todoService.isValid(todoData, result);
+		if(!result.hasErrors() && isValid) {
+			//エラーなし
+			Todo todo = todoData.toEntity();
+			todoRepository.saveAndFlush(todo);
+			return "redirect:/todo";
+		} else {
+			//エラーあり
+			return "todoForm";
+		}
+	}
+	
+	//「削除」ボタンが押された時の処理
+	@PostMapping("todo/delete")
+	public String deleteTodo(@ModelAttribute TodoData todoData) {
+		todoRepository.deleteById(todoData.getId());
+		return "redirect:/todo";
+	}
 
 }

@@ -10,6 +10,14 @@
 				<!-- th:object=の後に記述すオブジェクトは下位要素内で「*{}」の形式でプロパティ値を取得できる  -->
 		<table>
 			<tr>
+				<th>id</th>
+				<td>
+					<span th:text="*{id}"></span>
+					<input type="hidden" th:field="*{id}">
+				</td>
+			</tr>
+			
+			<tr>
 				<th>件名</th>
 				<td>
 					<input type="text" name="title" size="40" th:value=*{title}>
@@ -57,6 +65,12 @@
 				</td>
 			</tr>
 		</table>
+		 <div th:if="${session.mode == 'update'}">
+			<button type="submit" th:formaction="@{/todo/update}">更新</button>
+			<button type="submit" th:formaction="@{/todo/delete}">削除</button>
+			<button type="submit" th:formaction="@{/todo/cancel}">キャンセル</button>
+		</div>
+		
 		<div>
 			<button type="submit" th:formaction="@{/todo/create}">登録</button>
 			<button type="submit" th:formaction="@{/todo/cancel}">キャンセル</button>
