@@ -48,18 +48,18 @@ public class TodoListController {
 	
 	//登録ボタンがクリックされたとき
 	@PostMapping("/todo/create")
-	public ModelAndView createTodo(@ModelAttribute @Validated TodoData todoData, BindingResult result, ModelAndView mv) {
+	public String createTodo(@ModelAttribute @Validated TodoData todoData, BindingResult result, Model model) {
 		//エラーチェック
 		boolean isValid = todoService.isValid(todoData, result);
 		if(!result.hasErrors() && isValid) {
 			//エラーなし
 			Todo todo = todoData.toEntity();
 			todoRepository.saveAndFlush(todo);
-			return showTodoList(mv);
+			return "redirect:/todo";
 		} else {
 			//エラーあり
-			mv.setViewName("todoForm");
-			return mv;
+			//mv.setViewName("todoForm");
+			return "todoForm";
 		}
 	}
 	

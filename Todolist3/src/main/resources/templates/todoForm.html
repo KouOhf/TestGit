@@ -70,8 +70,8 @@
 			<button type="submit" th:formaction="@{/todo/delete}">削除</button>
 			<button type="submit" th:formaction="@{/todo/cancel}">キャンセル</button>
 		</div>
-		
-		<div>
+		<!-- th:unless はif条件がfalseのとき -->
+		<div th:unless="${session.mode == 'update'}">
 			<button type="submit" th:formaction="@{/todo/create}">登録</button>
 			<button type="submit" th:formaction="@{/todo/cancel}">キャンセル</button>
 		</div>
