@@ -8,9 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import com.example.todolist.entity.Todo;
 
-@Repository
+
 //JpaRepository<Todo, Integer> ・・・ 第一引数＝entityのクラス/第二引数＝「主キー(@ID)のクラス」
 //これにより、CRUDが一通り使える
+@Repository
 public interface TodoRepository extends JpaRepository<Todo, Integer>{
 	List<Todo> findByTitleLike(String title);
 	List<Todo> findByImportance(Integer importance);
