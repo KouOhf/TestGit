@@ -5,10 +5,15 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import com.example.todolist.common.Utils;
 import com.example.todolist.entity.Todo;
@@ -74,8 +79,58 @@ public class TodoDaoImpl implements TodoDao {
 	}
 	
 	//CriteriaAPIによる検索
+//	@Override
+//	public List<Todo> findByCriteria(TodoQuery todoQuery) {
+//		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+//		CriteriaQuery<Todo> query = builder.createQuery(Todo.class);
+//		Root<Todo> root = query.from(Todo.class);
+//		List<Predicate> predicates = new ArrayList<>();
+//		
+//		
+//		//件名
+//		String title = "";
+//		if(todoQuery.getTitle().length()>0) {
+//			title = "%" + todoQuery.getTitle() + "%";
+//		} else {
+//			title = "%";
+//		}
+//		predicates.add(builder.like(root.get(Todo_.TITLE), title));
+//		
+//		//重要度
+//		if(todoQuery.getImportance() != -1) {
+//			predicates.add(builder.and(builder.equal(root.get(Todo_.IMPORTANCE), todoQuery.getImportance())));
+//		}
+//		
+//		//緊急度
+//		if(todoQuery.getUrgency() != -1) {
+//			predicates.add(builder.and(builder.equal(root.get(Todo_.URGENCY), todoQuery.getUrgency())));
+//		}
+//		//期限：開始～
+//		if(!todoQuery.getDeadlineFrom().equals("")) {
+//			predicates.add(builder.and(builder.greaterThanOrEqualTo(root.get(Todo_.DEADLINE), Utils.str2date(todoQuery.getDeadlineFrom()))));
+//		}
+//		
+//		//期限：終了で検索
+//		if(!todoQuery.getDeadlineTo().equals("")) {
+//			predicates.add(builder.and(builder.lessThanOrEqualTo(root.get(Todo_.DEADLINE), Utils.str2date(todoQuery.getDeadlineTo()))));
+//		}
+//		//完了
+//		if(todoQuery.getDone() != null && todoQuery.getDone().equals("Y")) {
+//			predicates.add(builder.and(builder.equal(root.get(Todo_.DONE), todoQuery.getDone())));
+//		}
+//		
+//		//SELECT作成
+//		Predicate[] predArray = new Predicate[predicates.size()];
+//		predicates.toArray(predArray);
+//		query = query.select(root).where(predArray).orderBy(builder.asc(root.get(Todo_.ID)));
+//		//検索
+//		List<Todo> list = entityManager.createQuery(query).getResultList();
+//		
+//		return list;
+//	}
+	
 	@Override
-	public List<Todo> findByCriteria(TodoQuery todoQuery) {
+	public Page<Todo> findByCriteria(TodoQuery todoQuery, Pageable pageable) {
 		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Todo> query = builder.createQuery(Todo.class);
 		Root<Todo> root = query.from(Todo.class);
@@ -118,10 +173,21 @@ public class TodoDaoImpl implements TodoDao {
 		Predicate[] predArray = new Predicate[predicates.size()];
 		predicates.toArray(predArray);
 		query = query.select(root).where(predArray).orderBy(builder.asc(root.get(Todo_.ID)));
-		//検索
-		List<Todo> list = entityManager.createQuery(query).getResultList();
 		
-		return list;
+		//クエリ作成
+		TypedQuery<Todo> typedQuery = entityManager.createQuery(query);
+		//該当レコード数取得
+		int totalRows = typedQuery.getResultList().size();
+		//先頭レコードの位置設定
+		typedQuery.setFirstResult(pageable.getPageNumber()*pageable.getPageSize());
+		//1ページ当たりの件数
+		typedQuery.setMaxResults(pageable.getPageSize());
+		//検索
+		//List<Todo> list = entityManager.createQuery(query).getResultList();
+		Page<Todo> page = new PageImpl<Todo>(typedQuery.getResultList(),pageable,totalRows);
+		
+		return page;
 	}
+	
 
 }

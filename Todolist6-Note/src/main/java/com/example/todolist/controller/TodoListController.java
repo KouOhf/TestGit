@@ -135,10 +135,6 @@ public class TodoListController {
 		Page<Todo> todoPage = null;
 		if(todoService.isValid(todoQuery, result)){
 			//エラーがなければ検索
-			//todoList = todoService.doQuery(todoQuery);
-			//↑list4時の記述　↓ここでJPQLによる検索に書き換え
-			//todoList = todoDaoImpl.findByJPQL(todoQuery);
-			//todoList = todoDaoImpl.findByCriteria(todoQuery);
 			todoPage = todoDaoImpl.findByCriteria(todoQuery,pageable);
 			//入力された検索条件をsesssionに保存
 			session.setAttribute("todoQuery", todoQuery);
@@ -149,10 +145,22 @@ public class TodoListController {
 			mv.addObject("todoPage", null);
 			mv.addObject("todoList", null);
 		}
-		//mv.addObject("todoQuery", todoQuery)
-		//mv.addObject("todoList", todoList);
 		return mv;
 	}
+	
+	@GetMapping("todo/query")
+	public ModelAndView queryTodo(@PageableDefault(page = 0, size = 5)Pageable pageable, ModelAndView mv) {
+		mv.setViewName("todoList");
+		//sessionに保存されている条件で検索
+		TodoQuery todoQuery = (TodoQuery)session.getAttribute("todoQuery");
+		Page<Todo> todoPage = todoDaoImpl.findByCriteria(todoQuery, pageable);
+		mv.addObject("todoQuery", todoQuery);
+		mv.addObject("todoPage", todoPage); //Page情報
+		mv.addObject("todoList",todoPage.getContent());
+		
+		return mv;
+	}
+	
 	
 	
 

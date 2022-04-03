@@ -12,7 +12,7 @@ public interface TodoDao {
 	//JPQLによる検索
 	List<Todo> findByJPQL(TodoQuery todoQuery);
 	//Criteria APIによる検索
-	List<Todo> findByCriteria(TodoQuery todoQuery);
+	//List<Todo> findByCriteria(TodoQuery todoQuery);
 	
 	Page<Todo> findByCriteria(TodoQuery todoQuery, Pageable pegeable);
 }
